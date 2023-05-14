@@ -1,11 +1,13 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework import permissions, generics
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, \
+    DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 
-from quiz.filter import LessonFilter
-from quiz.models import Lesson
-from quiz.serializers import LessonSerializer
+from core.permissions.permissionList import TeacherPermission
+from quiz.filter import LessonFilter, VariantFilter
+from quiz.models import Lesson, Variant, VariantQuestions, Question
+from quiz.serializers import LessonSerializer, VariantSerializer, QuestionVariantSerializer, \
+    VariantQuestionCreateSerializer, QuestionCreationSerializer
 
 
 class LessonViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -16,3 +18,44 @@ class LessonViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     filterset_class = LessonFilter
+
+
+class VariantViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, GenericViewSet):
+    """ Варианты """
+
+    queryset = Variant.objects.all()
+    serializer_class = VariantSerializer
+    permission_classes = [TeacherPermission]
+
+    filterset_class = VariantFilter
+
+
+class QuestionVariantView(generics.ListAPIView):
+    """ Вопросы Варианта """
+
+    queryset = VariantQuestions.objects.all().select_related('variant', 'question')
+    serializer_class = QuestionVariantSerializer
+    permission_classes = [TeacherPermission]
+    lookup_field = None
+
+    def get_queryset(self):
+        variant = self.kwargs.get('variant')
+        lesson = self.kwargs.get('lesson')
+        queryset = super().get_queryset().filter(variant=variant, question__lesson=lesson)
+        return queryset
+
+
+class CreateQuestionView(generics.CreateAPIView):
+    """ Добавление Вопроса к Варианту """
+
+    queryset = VariantQuestions.objects.all()
+    serializer_class = VariantQuestionCreateSerializer
+    permission_classes = [TeacherPermission]
+
+
+class QuestionViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
+    """ Вопросы """
+
+    queryset = Question.objects.all()
+    serializer_class = QuestionCreationSerializer
+    permission_classes = [TeacherPermission]

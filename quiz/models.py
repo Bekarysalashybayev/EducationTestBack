@@ -85,6 +85,15 @@ class Variant(TimeStampedModel):
 
 
 class Question(TimeStampedModel):
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='variant_questions',
+        null=True,
+        blank=False,
+        verbose_name="Предмет"
+    )
+
     question = models.TextField(
         null=False,
         blank=False,
@@ -97,10 +106,9 @@ class Question(TimeStampedModel):
         db_table = 'question'
         verbose_name = "Вопрос"
         verbose_name_plural = "Вопросы"
-        ordering = ["id"]
 
     def __str__(self):
-        return f"{self.question}"
+        return f"{self.lesson} => {self.question}"
 
 
 class Answer(TimeStampedModel):
@@ -127,12 +135,11 @@ class Answer(TimeStampedModel):
 
     class Meta:
         db_table = 'answer'
-        verbose_name = "Вопрос"
-        verbose_name_plural = "Вопросы"
-        ordering = ["order"]
+        verbose_name = "Ответы"
+        verbose_name_plural = "Ответы"
 
     def __str__(self):
-        return f"{self.question}"
+        return f"{self.answer}"
 
 
 class VariantQuestions(models.Model):
@@ -144,14 +151,6 @@ class VariantQuestions(models.Model):
         blank=False,
         verbose_name="Вариант"
     )
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        related_name='variant_questions',
-        null=False,
-        blank=False,
-        verbose_name="Предмет"
-    )
 
     question = models.ForeignKey(
         Question,
@@ -159,7 +158,7 @@ class VariantQuestions(models.Model):
         related_name='variant_questions',
         null=False,
         blank=False,
-        verbose_name="Предмет"
+        verbose_name="Вопрос"
     )
 
     order = models.IntegerField(
@@ -172,11 +171,11 @@ class VariantQuestions(models.Model):
         db_table = 'variant_questions'
         verbose_name = "Вопросы варианта"
         verbose_name_plural = "Вопросы варианта"
-        unique_together = [['lesson', 'question', ], ['variant', 'lesson', 'question', 'order']]
-        ordering = ["variant", "lesson", "order"]
+        unique_together = ['variant', 'question', ]
+        ordering = ["variant", "order"]
         indexes = [
-            models.Index(fields=["variant", "lesson", "question"]),
+            models.Index(fields=["variant", "question"]),
         ]
 
     def __str__(self):
-        return f"{self.variant} => {self.lesson} => {self.question}"
+        return f"{self.variant} => {self.question}"
