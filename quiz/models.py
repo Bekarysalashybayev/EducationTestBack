@@ -1,6 +1,7 @@
 from django.db import models
 
 from core.abstract.NameModel import NameModel
+from core.abstract.TimeStampedModel import TimeStampedModel
 from core.constants.LanguagesChoices import LANGUAGE_CHOICES
 from core.constants.TestTypesChoices import TEST_TYPES
 
@@ -40,7 +41,7 @@ class Lesson(NameModel):
         return f"{self.name_kz}"
 
 
-class Variant(models.Model):
+class Variant(TimeStampedModel):
     test_type = models.CharField(
         max_length=10,
         choices=TEST_TYPES.choices(),
@@ -83,7 +84,7 @@ class Variant(models.Model):
         return f"{self.test_type} -> {self.name} -> {self.language}"
 
 
-class Question(models.Model):
+class Question(TimeStampedModel):
     question = models.TextField(
         null=False,
         blank=False,
@@ -139,8 +140,11 @@ class VariantQuestions(models.Model):
         db_table = 'variant_questions'
         verbose_name = "Вопросы варианта"
         verbose_name_plural = "Вопросы варианта"
-        unique_together = ['variant', 'lesson', 'question']
+        unique_together = [['lesson', 'question', ], ['variant', 'lesson', 'question', 'order']]
         ordering = ["id"]
+        indexes = [
+            models.Index(fields=["variant", "lesson", "question"]),
+        ]
 
     def __str__(self):
-        return f"{self.test_type} + {self.name}"
+        return f"{self.variant} => {self.lesson} => {self.question}"
