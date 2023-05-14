@@ -1,5 +1,5 @@
 """
-ASGI config for EducationTest project.
+ASGI core for EducationTest project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

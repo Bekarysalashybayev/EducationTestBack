@@ -1,7 +1,11 @@
 from django.urls import path, include
+from rest_framework import routers
 
-from quiz.views import TestApi
+from quiz.views import LessonViewSet
+
+quizRouter = routers.DefaultRouter()
+quizRouter.register(r'lesson', LessonViewSet, )
 
 urlpatterns = [
-    path('', TestApi.as_view()),
+    path('', include(quizRouter.urls)),
 ]

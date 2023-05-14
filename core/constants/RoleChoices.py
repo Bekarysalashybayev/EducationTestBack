@@ -1,4 +1,4 @@
-from config.constants.helper import Choice
+from core.constants.Helper import Choice
 
 
 class ROLES(str, Choice):

@@ -1,8 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from config.abstract.TimeStampedModel import TimeStampedModel
-from config.constants.RoleChoices import ROLES
+from core.abstract.TimeStampedModel import TimeStampedModel
+from core.constants.RoleChoices import ROLES
 
 
 class Role(models.Model):

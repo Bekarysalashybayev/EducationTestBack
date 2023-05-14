@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-from config.constants.RoleChoices import ROLES
+from core.constants.RoleChoices import ROLES
 
 
 class StudentPermission(BasePermission):

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from config.constants.RoleChoices import ROLES
+from core.constants.RoleChoices import ROLES
 from oauth.models import User, Role
 
 

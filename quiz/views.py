@@ -1,11 +1,18 @@
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import permissions
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.viewsets import GenericViewSet
 
-from config.permissions.permissionList import TeacherPermission
+from quiz.filter import LessonFilter
+from quiz.models import Lesson
+from quiz.serializers import LessonSerializer
 
 
-class TestApi(APIView):
-    permission_classes = [TeacherPermission]
+class LessonViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+    """ Предметы """
 
-    def get(self, request):
-        return Response({'msg': 'OK'})
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    filterset_class = LessonFilter
