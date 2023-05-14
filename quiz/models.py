@@ -91,13 +91,45 @@ class Question(TimeStampedModel):
         verbose_name="Вопрос"
     )
 
-    point = models.IntegerField(default=1)
+    point = models.IntegerField(default=1, verbose_name="Балл")
 
     class Meta:
-        db_table = 'questions'
+        db_table = 'question'
         verbose_name = "Вопрос"
         verbose_name_plural = "Вопросы"
         ordering = ["id"]
+
+    def __str__(self):
+        return f"{self.question}"
+
+
+class Answer(TimeStampedModel):
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        related_name='answers',
+        null=False,
+        blank=False,
+        verbose_name="Вопрос"
+    )
+    answer = models.TextField(
+        null=False,
+        blank=False,
+        verbose_name="Ответ"
+    )
+    is_correct = models.BooleanField(default=False, verbose_name="Правильно")
+
+    order = models.IntegerField(
+        null=False,
+        blank=False,
+        verbose_name="Очередь"
+    )
+
+    class Meta:
+        db_table = 'answer'
+        verbose_name = "Вопрос"
+        verbose_name_plural = "Вопросы"
+        ordering = ["order"]
 
     def __str__(self):
         return f"{self.question}"
@@ -141,7 +173,7 @@ class VariantQuestions(models.Model):
         verbose_name = "Вопросы варианта"
         verbose_name_plural = "Вопросы варианта"
         unique_together = [['lesson', 'question', ], ['variant', 'lesson', 'question', 'order']]
-        ordering = ["id"]
+        ordering = ["variant", "lesson", "order"]
         indexes = [
             models.Index(fields=["variant", "lesson", "question"]),
         ]
