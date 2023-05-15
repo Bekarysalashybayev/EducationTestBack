@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from drf_writable_nested import WritableNestedModelSerializer
 
-from quiz.models import Lesson, Variant, VariantQuestions, Question, Answer
+from quiz.models import Lesson, Variant, VariantQuestions, Question, Answer, UploadImage
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -17,7 +17,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = ('pk', 'answer', 'order')
+        fields = ('pk', 'answer', 'order', 'is_correct')
 
 
 class AnswerCreationSerializer(serializers.ModelSerializer):
@@ -45,7 +45,7 @@ class QuestionCreationSerializer(WritableNestedModelSerializer, serializers.Mode
 
     class Meta:
         model = Question
-        fields = ('id', 'question', 'point', 'lesson', 'answers')
+        fields = ('id', 'question', 'point', 'lesson', 'answers', 'link', 'correct_way')
 
 
 class QuestionVariantSerializer(serializers.ModelSerializer):
@@ -80,3 +80,11 @@ class VariantQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = VariantQuestions
         fields = "__all__"
+
+
+class ImageUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UploadImage
+        fields = (
+            'upload',
+        )

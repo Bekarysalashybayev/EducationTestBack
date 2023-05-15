@@ -1,13 +1,16 @@
-from rest_framework import permissions, generics
+from rest_framework import permissions, generics, status
+from rest_framework.generics import CreateAPIView
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, \
     DestroyModelMixin
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from core.pagination.pagination import StandardPagination
 from core.permissions.permissionList import TeacherPermission
 from quiz.filter import LessonFilter, VariantFilter
 from quiz.models import Lesson, Variant, VariantQuestions, Question
 from quiz.serializers import LessonSerializer, VariantSerializer, QuestionVariantSerializer, \
-    VariantQuestionCreateSerializer, QuestionCreationSerializer
+    VariantQuestionCreateSerializer, QuestionCreationSerializer, ImageUploadSerializer
 
 
 class LessonViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -20,12 +23,13 @@ class LessonViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     filterset_class = LessonFilter
 
 
-class VariantViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, GenericViewSet):
+class VariantViewSet(ListModelMixin, RetrieveModelMixin, DestroyModelMixin, CreateModelMixin, GenericViewSet):
     """ Варианты """
 
     queryset = Variant.objects.all()
     serializer_class = VariantSerializer
     permission_classes = [TeacherPermission]
+    pagination_class = StandardPagination
 
     filterset_class = VariantFilter
 
@@ -59,3 +63,12 @@ class QuestionViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, G
     queryset = Question.objects.all()
     serializer_class = QuestionCreationSerializer
     permission_classes = [TeacherPermission]
+
+
+class SaveImageView(CreateAPIView):
+    serializer_class = ImageUploadSerializer
+
+    def post(self, request, *args, **kwargs):
+        data = self.create(request, *args, **kwargs).data
+        return Response({"url": data.get('upload')},
+                        status=status.HTTP_201_CREATED)

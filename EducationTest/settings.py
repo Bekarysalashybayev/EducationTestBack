@@ -18,6 +18,11 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4001",
+    "http://127.0.0.1:4001",
+]
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -31,7 +36,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'drf_yasg',
-    "debug_toolbar",
+    'debug_toolbar',
+    'corsheaders',
     # apps
     'quiz.apps.QuizConfig',
     'oauth.apps.OauthConfig',
@@ -40,7 +46,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

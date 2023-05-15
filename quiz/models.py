@@ -100,6 +100,18 @@ class Question(TimeStampedModel):
         verbose_name="Вопрос"
     )
 
+    correct_way = models.TextField(
+        null=True,
+        blank=False,
+        verbose_name="Объяснение"
+    )
+
+    link = models.TextField(
+        null=True,
+        blank=False,
+        verbose_name="Ссылка"
+    )
+
     point = models.IntegerField(default=1, verbose_name="Балл")
 
     class Meta:
@@ -179,3 +191,7 @@ class VariantQuestions(models.Model):
 
     def __str__(self):
         return f"{self.variant} => {self.question}"
+
+
+class UploadImage(TimeStampedModel):
+    upload = models.ImageField(upload_to='image/')
