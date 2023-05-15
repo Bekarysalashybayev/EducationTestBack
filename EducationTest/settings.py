@@ -19,6 +19,8 @@ INTERNAL_IPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
+    "https://nis.testhub.kz",
+    "https:admin-nis.testhub.kz",
     "http://localhost:4001",
     "http://127.0.0.1:4001",
 ]
