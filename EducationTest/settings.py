@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     # apps
     'quiz.apps.QuizConfig',
     'oauth.apps.OauthConfig',
+    'pass_test.apps.PassTestConfig'
 ]
 
 MIDDLEWARE = [

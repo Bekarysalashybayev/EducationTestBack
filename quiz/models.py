@@ -2,17 +2,71 @@ from django.db import models
 
 from core.abstract.NameModel import NameModel
 from core.abstract.TimeStampedModel import TimeStampedModel
+from core.constants.AnswerChoices import ANSWER_CHOICES
 from core.constants.LanguagesChoices import LANGUAGE_CHOICES
 from core.constants.TestTypesChoices import TEST_TYPES
 
 
 class Lesson(NameModel):
-    test_type = models.CharField(
+    icon = models.ImageField(
+        upload_to='lessons/',
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+        db_table = 'lesson'
+        verbose_name = "Предмет"
+        verbose_name_plural = "Предметы"
+
+    def __str__(self):
+        return f"{self.name_kz}"
+
+
+class TestType(models.Model):
+    name = models.CharField(
         max_length=10,
         choices=TEST_TYPES.choices(),
         null=False,
         blank=False,
+        unique=True,
         verbose_name="Тип Теста"
+    )
+    duration = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Длительность в минутах"
+    )
+    has_by_lesson = models.BooleanField(
+        default=False,
+        verbose_name="По очереди"
+    )
+
+    class Meta:
+        db_table = 'test_type'
+        verbose_name = "Тип теста"
+        verbose_name_plural = "Тип теста"
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class TestTypeLesson(models.Model):
+    test_type = models.ForeignKey(
+        TestType,
+        on_delete=models.CASCADE,
+        related_name='test_types',
+        null=False,
+        blank=False,
+        verbose_name="Тип Теста"
+    )
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='test_type_lessons',
+        null=False,
+        blank=False,
+        verbose_name="Предмет"
     )
     order = models.IntegerField(
         null=False,
@@ -24,27 +78,22 @@ class Lesson(NameModel):
         blank=False,
         verbose_name="Длительность в минутах"
     )
-    icon = models.ImageField(
-        upload_to='lessons/',
-        null=True,
-        blank=True
-    )
 
     class Meta:
-        db_table = 'lesson'
-        verbose_name = "Предмет"
-        verbose_name_plural = "Предметы"
-        unique_together = ['test_type', 'order']
-        ordering = ["order"]
+        db_table = 'test_type_lesson'
+        verbose_name = "Предметы теста"
+        verbose_name_plural = "Предметы теста"
+        unique_together = ['test_type', 'lesson']
 
     def __str__(self):
-        return f"{self.name_kz}"
+        return f"{self.test_type.name} - {self.lesson.name_kz}"
 
 
 class Variant(TimeStampedModel):
-    test_type = models.CharField(
-        max_length=10,
-        choices=TEST_TYPES.choices(),
+    test_type = models.ForeignKey(
+        TestType,
+        on_delete=models.CASCADE,
+        related_name='test_type_variants',
         null=False,
         blank=False,
         verbose_name="Тип Теста"
@@ -100,6 +149,15 @@ class Question(TimeStampedModel):
         verbose_name="Вопрос"
     )
 
+    choice = models.CharField(
+        max_length=12,
+        choices=ANSWER_CHOICES.choices(),
+        null=False,
+        blank=False,
+        verbose_name="Тип Ответа",
+        default=ANSWER_CHOICES.CHOICE
+    )
+
     correct_way = models.TextField(
         null=True,
         blank=False,
@@ -120,7 +178,7 @@ class Question(TimeStampedModel):
         verbose_name_plural = "Вопросы"
 
     def __str__(self):
-        return f"{self.lesson} => {self.question}"
+        return f"{self.lesson} => {self.question[:100]}"
 
 
 class Answer(TimeStampedModel):
@@ -137,6 +195,7 @@ class Answer(TimeStampedModel):
         blank=False,
         verbose_name="Ответ"
     )
+
     is_correct = models.BooleanField(default=False, verbose_name="Правильно")
 
     order = models.IntegerField(
@@ -151,7 +210,7 @@ class Answer(TimeStampedModel):
         verbose_name_plural = "Ответы"
 
     def __str__(self):
-        return f"{self.answer}"
+        return f"{self.answer[:100]}"
 
 
 class VariantQuestions(models.Model):

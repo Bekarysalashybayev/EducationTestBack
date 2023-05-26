@@ -77,7 +77,7 @@ docs/_build/
 # PyBuilder
 target/
 media/image/*
-
+media/*
 ### Django ###
 *.log
 *.pyc

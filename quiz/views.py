@@ -26,7 +26,7 @@ class LessonViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 class VariantViewSet(ListModelMixin, RetrieveModelMixin, DestroyModelMixin, CreateModelMixin, GenericViewSet):
     """ Варианты """
 
-    queryset = Variant.objects.all()
+    queryset = Variant.objects.all().select_related('test_type')
     serializer_class = VariantSerializer
     permission_classes = [TeacherPermission]
     pagination_class = StandardPagination

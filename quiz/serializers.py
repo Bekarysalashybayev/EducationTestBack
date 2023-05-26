@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from drf_writable_nested import WritableNestedModelSerializer
 
+from core.constants.AnswerChoices import ANSWER_CHOICES
 from quiz.models import Lesson, Variant, VariantQuestions, Question, Answer, UploadImage
 
 
@@ -46,6 +47,18 @@ class QuestionCreationSerializer(WritableNestedModelSerializer, serializers.Mode
     class Meta:
         model = Question
         fields = ('id', 'question', 'point', 'lesson', 'answers', 'link', 'correct_way')
+
+    def create(self, validated_data):
+        answers = validated_data.get('answers')
+        quantity_correct = 0
+        for i in answers:
+            if i.get('is_correct'):
+                quantity_correct += 1
+
+        if quantity_correct > 1:
+            validated_data['choice'] = ANSWER_CHOICES.MULTICHOICE
+
+        return super().create(validated_data)
 
 
 class QuestionVariantSerializer(serializers.ModelSerializer):
